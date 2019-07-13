@@ -10,7 +10,7 @@ $(() => {
     let obj = phoneData.find(e => {
         return e.pID === id;
     });
-    console.log(obj);
+    // console.log(obj);
     // 修改图片
     $('.preview-img img').attr('src', obj.imgSrc);
     // 修改文字描述
@@ -49,6 +49,31 @@ $(() => {
     })
 
 
-
-    
+    // 点击实现添加进入购物车
+    $('.addshopcar').on('click',function(){
+        // 要将对应id的图片 名字 单价 数量 存入本地中
+        // 因为不知道会加入多少个商品 所以 我们要用一个数组存起来
+        // 获取商品数量 就是获取文本域内容 并且转换成数字类型
+        let number = parseInt($('.choose-number').val());
+        // let arr = [];//这里不能这样设置 不然每次点击的时候 都会把原来数组的内容都变成空数组
+        // 要先把本地的内容读取出来
+        let jsonStr = localStorage.getItem('shopCartData');
+        let arr;
+        if(jsonStr === null){
+            arr = [];
+        }else{
+            arr = JSON.parse(jsonStr);
+        }
+        let goods = {
+            id : obj.pID,
+            img : obj.imgSrc,
+            name : obj.name,
+            price : obj.print,
+            number : number
+        }
+        arr.push(goods);
+        // 转换成json字符串
+        jsonStr = JSON.stringify(arr);//记得这里不用再次声明jsonstr
+        localStorage.setItem('shopCartData',jsonStr);
+    })
 })
