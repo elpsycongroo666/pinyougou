@@ -159,21 +159,47 @@ $(() => {
     getMoneyAndCount();
   })
 
-  // 使用jQueryui制作提示框
-  (function() {
-    $( "#dialog-confirm" ).dialog({
+
+  // 当我点击删除按钮的时候 才弹出提示框
+  $('.item-list').on('click','.item-del',function(){
+     // 使用jqueryUI来制作提示框
+    // 因为我们在里面的this不是我们想要的this 所以我们在这里用一个变量存储起来 一般用_this来命名
+    let _this = this;
+     $( "#dialog-confirm" ).dialog({
       resizable: false,
-      height:140,
+      height:150,
       modal: true,
       buttons: {
-        "Delete all items": function() {
+        "确定": function() {
           $( this ).dialog( "close" );
+          // 点击确认按钮的时候 把结构删除
+          $(_this).parents('.item').remove();
+          // 当我们点击删除之后 要把对应id的本地数据也删除 覆盖回去
+          // 先获取当前id
+          let id = parseInt($(_this).parents('.item').attr('data-id'));
+          // 找到对应本地的id
+          let obj = arr.find(e=>{
+            e.pID === id;
+          })
+          // 通过索引用splice删除数组中对应的数据 数组.indexOf() 
+          let index = arr.indexOf(obj);
+          // 把数组中的对应的obj删除  splice(要删除的元素的索引，删除几个，有没有另外的数据替代)
+          arr.splice(index,1);
+          // 删除之后还要存会本地中 覆盖掉
+          let jsonStr = JSON.stringify(arr);
+          localStorage.setItem('shopCartData',jsonStr);
+          // 调用一次
+          getMoneyAndCount();
         },
-        Cancel: function() {
+        "取消": function() {
           $( this ).dialog( "close" );
         }
       }
     });
-  });
+  })
+ 
 
+
+
+  
 })
