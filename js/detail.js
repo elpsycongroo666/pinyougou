@@ -77,7 +77,7 @@ $(() => {
                 pID: obj.pID,
                 img: obj.imgSrc,
                 name: obj.name,
-                price: obj.print,
+                price: obj.price,
                 number: number
             }
             arr.push(goods);    
