@@ -76,7 +76,8 @@ $(() => {
     $('.total-money').text(totalMoney);
   }
 
-
+  // 一开始加载的时候就要先计算一次
+  getMoneyAndCount();
 
   // 实现全选和全不选 其实应该使用事件委托来做 因为 这些都是动态生成的 如果不用的话 我们到时候 从服务器传来的数据 就会出错
   $('.pick-all').on('click', function () {
@@ -100,5 +101,79 @@ $(() => {
     // 每次点击完都要计算当前页面中的价格 所以我们把计算总价和总数的过程封装成函数 在调用
     getMoneyAndCount();
   })
+
+
+  // 实现点击+号数量增加 还要计算总和
+  $('.item-list').on('click', '.add', function () {
+    // 把文本框的内容自增 
+    // 然后因为是字符串 自增的话要是数字
+    let oldVal = parseInt($(this).siblings('input').val());
+    // console.log(oldVal); 字符串
+    oldVal++;
+    if(oldVal > 1){
+      $(this).siblings('.reduce').removeClass('disabled');
+    }
+    // 在把他设置回文本中
+    $(this).siblings('input').val(oldVal);
+    // 我们要判断控制数量的是哪一个商品 那么就要通过id来找
+    let id = parseInt($(this).parents('.item').attr('data-id'));
+    let obj = arr.find(e=>{
+      return e.pID === id;
+    })
+     // 更新对应的数据
+     obj.number = oldVal;
+     // 一刷新就没了 所以我们需要存入本地数据
+     let jsonStr = JSON.stringify(arr);
+     localStorage.setItem('shopCartData',jsonStr);
+    // 每次点击完都要计算当前页面中的价格 所以我们把计算总价和总数的过程封装成函数 在调用
+    getMoneyAndCount();
+  })
+
+
+  // 实现点击-号数量减少 计算总和
+  $('.item-list').on('click','.reduce',function(){
+    
+    // 获取文本内容
+    let oldVal = parseInt($(this).siblings('.number').val());
+    if(oldVal === 1){
+      return;
+    }
+    oldVal--;
+    if(oldVal === 1){
+      $(this).addClass('disabled');
+    }
+    $(this).siblings('.number').val(oldVal);
+    // 减少对应物品的数量 根据id判断
+    let id = parseInt($(this).parents('.item').attr('data-id'));
+    // 通过find来找到对应的元素
+    let obj = arr.find(e=>{
+      return e.pID === id;
+    })
+    obj.number = oldVal;
+    // 传入本地数据
+    // 现将arr转换成json字符串类型
+    let jsonStr = JSON.stringify(arr);
+    // 存入
+    localStorage.setItem('shopCartData',jsonStr);
+    // 每次点击之后还要把计算算一次
+    getMoneyAndCount();
+  })
+
+  // 使用jQueryui制作提示框
+  (function() {
+    $( "#dialog-confirm" ).dialog({
+      resizable: false,
+      height:140,
+      modal: true,
+      buttons: {
+        "Delete all items": function() {
+          $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      }
+    });
+  });
 
 })
