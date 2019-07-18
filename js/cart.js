@@ -52,30 +52,53 @@ $(() => {
   }
 
   // 计算总价和数量
-  // 考虑到我们删除的时候也要用到id  所以我们就用 包含着 多选框 和 删除按钮 的父元素 设置了一个自定义id
-  let totalCount = 0;
-  let totalMoney = 0;
-  // 当我们选中物品的时候 就计算 没选中的时候 就不算   
-  // input[type="checkbox"] 多选 : ckecked选中的情况下
-  $('.item-list input[type=checkbox]:checked').each((i, e) => { //获取回来的是一个伪数组 
-    // console.log(e);
-    let id = parseInt($(e).parents('.item').attr('data-id'));
-    // console.log(id);
-    arr.forEach(e => { 
-      if (e.pID === id) {
-        totalCount += e.number;
-        totalMoney += e.number * e.price;
-      }
-    })
-  }); //=>这里获取回来的是字符串形式
-  // 判断这个id与我们获取本地的是否一致 一致的话就计算
+  function getMoneyAndCount() {
+    // 考虑到我们删除的时候也要用到id  所以我们就用 包含着 多选框 和 删除按钮 的父元素 设置了一个自定义id
+    let totalCount = 0;
+    let totalMoney = 0;
+    // 当我们选中物品的时候 就计算 没选中的时候 就不算   
+    // input[type="checkbox"] 多选 : ckecked选中的情况下
+    $('.item-list input[type=checkbox]:checked').each((i, e) => { //获取回来的是一个伪数组 
+      // console.log(e);
+      let id = parseInt($(e).parents('.item').attr('data-id'));
+      // console.log(id);
+      arr.forEach(e => {
+        if (e.pID === id) {
+          totalCount += e.number;
+          totalMoney += e.number * e.price;
+        }
+      })
+    }); //=>这里获取回来的是字符串形式
+    // 判断这个id与我们获取本地的是否一致 一致的话就计算
 
-  // 修改数量和总价
-  $('.selected').text(totalCount);
-  $('.total-money').text(totalMoney);
+    // 修改数量和总价
+    $('.selected').text(totalCount);
+    $('.total-money').text(totalMoney);
+  }
 
 
 
+  // 实现全选和全不选 其实应该使用事件委托来做 因为 这些都是动态生成的 如果不用的话 我们到时候 从服务器传来的数据 就会出错
+  $('.pick-all').on('click', function () {
+    // 获取当前按钮的状态
+    let status = $(this).prop('checked');
+    // 将状态赋予其他子按钮
+    $('.item-ck').prop('checked', status);
+    // 还要结算的全选也带上
+    $('.pick-all').prop('checked', status);
+    // 每次点击完都要计算当前页面中的价格 所以我们把计算总价和总数的过程封装成函数 在调用
+    getMoneyAndCount();
+  })
 
+
+  // 实现单选按钮
+  $('.item-ck').on('click', function () {
+    // 在jq中checked有个属性 可以获得当前选中多少个按钮 以length的形式获得
+    let isAll = $('.item-ck:checked').length === $('.item-ck').length; //返回的是true 或者false
+    // 将这个状态赋给全选按钮就可以了
+    $('.pick-all').prop('checked', isAll);
+    // 每次点击完都要计算当前页面中的价格 所以我们把计算总价和总数的过程封装成函数 在调用
+    getMoneyAndCount();
+  })
 
 })
