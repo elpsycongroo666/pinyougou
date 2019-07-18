@@ -18,7 +18,7 @@ $(() => {
     // 修改价格
     $('.summary-price em').text('￥' + obj.price);
 
-    // debugger
+
     // 获取文本域内容
     let text = $('.choose-number');
     // 获取减号
@@ -50,7 +50,7 @@ $(() => {
 
 
     // 点击实现添加进入购物车
-    $('.addshopcar').on('click',function(){
+    $('.addshopcar').on('click', function () {
         // 要将对应id的图片 名字 单价 数量 存入本地中
         // 因为不知道会加入多少个商品 所以 我们要用一个数组存起来
         // 获取商品数量 就是获取文本域内容 并且转换成数字类型
@@ -59,21 +59,33 @@ $(() => {
         // 要先把本地的内容读取出来
         let jsonStr = localStorage.getItem('shopCartData');
         let arr;
-        if(jsonStr === null){
+        if (jsonStr === null) {
             arr = [];
-        }else{
+        } else {
             arr = JSON.parse(jsonStr);
         }
-        let goods = {
-            id : obj.pID,
-            img : obj.imgSrc,
-            name : obj.name,
-            price : obj.print,
-            number : number
+        // 为了不让相同商品在购物车中创建多次
+        // 我们就要把他没次点的相同的商品变成数量叠加起来
+        // 使用find方法， 该方法如果找到了该元素就会返回该元素 没有找到就会返回undefined
+        let isExit = arr.find(e => {
+            return e.pID === id;
+        })
+        if (isExit !== undefined) {//如果没有返回undefined那就代表本地中有相同商品 叠加数量
+            isExit.number += number;
+        } else {//否则 就将创建一个新的商品对象
+            let goods = {
+                pID: obj.pID,
+                img: obj.imgSrc,
+                name: obj.name,
+                price: obj.print,
+                number: number
+            }
+            arr.push(goods);    
         }
-        arr.push(goods);
         // 转换成json字符串
         jsonStr = JSON.stringify(arr);//记得这里不用再次声明jsonstr
-        localStorage.setItem('shopCartData',jsonStr);
+        localStorage.setItem('shopCartData', jsonStr);
+        // 点击之后跳转到购物车页面进行结算
+        location.href = 'cart.html';
     })
 })
